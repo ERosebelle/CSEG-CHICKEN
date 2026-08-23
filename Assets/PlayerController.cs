@@ -13,6 +13,11 @@ public class PlayerController : MonoBehaviour
     public float highJumpForce = 10f;
     public float maxHoldTime = 0.6f;
 
+    [Header("Auto Step")]
+    public float stepHeight = 0.5f;
+    public float stepCheckDistance = 0.5f;
+    public float stepSmooth = 5f;
+
     private Rigidbody rb;
     private Vector2 moveInput;
 
@@ -23,6 +28,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+
         rb.freezeRotation = true;
     }
 
@@ -57,6 +63,8 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity.y,
             move.z
         );
+
+        HandleAutoStep();
     }
 
     void HandleJump()
@@ -106,6 +114,71 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void HandleAutoStep()
+    {
+        if (moveInput.sqrMagnitude <= 0.01f)
+            return;
+
+        Vector3 direction =
+            (transform.forward * moveInput.y +
+             transform.right * moveInput.x).normalized;
+
+        // Check for an obstacle near the player's feet
+        Vector3 lowerOrigin =
+            transform.position +
+            Vector3.up * 0.1f;
+
+        if (!Physics.Raycast(
+            lowerOrigin,
+            direction,
+            out RaycastHit lowerHit,
+            stepCheckDistance))
+        {
+            return;
+        }
+
+        // Check if there is something blocking the top
+        Vector3 upperOrigin =
+            transform.position +
+            Vector3.up * stepHeight;
+
+        if (Physics.Raycast(
+            upperOrigin,
+            direction,
+            stepCheckDistance))
+        {
+            return;
+        }
+
+        // Look for walkable ground above the obstacle
+        Vector3 groundCheckOrigin =
+            lowerHit.point +
+            Vector3.up * stepHeight +
+            direction * 0.1f;
+
+        if (Physics.Raycast(
+            groundCheckOrigin,
+            Vector3.down,
+            out RaycastHit groundHit,
+            stepHeight + 0.3f))
+        {
+            Vector3 targetPosition =
+                rb.position;
+
+            targetPosition.y =
+                groundHit.point.y;
+
+            rb.MovePosition(
+                Vector3.Lerp(
+                    rb.position,
+                    targetPosition,
+                    stepSmooth *
+                    Time.fixedDeltaTime
+                )
+            );
+        }
+    }
+
     public void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
@@ -113,7 +186,16 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionStay(Collision collision)
     {
-        isGrounded = true;
+        foreach (ContactPoint contact in collision.contacts)
+        {
+            // Only consider surfaces underneath
+            // the player as ground
+            if (contact.normal.y > 0.5f)
+            {
+                isGrounded = true;
+                return;
+            }
+        }
     }
 
     void OnCollisionExit(Collision collision)
