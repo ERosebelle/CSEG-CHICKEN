@@ -3,36 +3,49 @@ using UnityEngine.InputSystem;
 
 public class CameraZoom : MonoBehaviour
 {
-    [Header("Zoom Settings")]
+    [Header("Zoom")]
     public float normalFOV = 60f;
     public float zoomFOV = 20f;
     public Key zoomKey = Key.Z;
 
-    [Header("Sniper Look")]
-    public float zoomSensitivity = 150f;
+    [Header("Look")]
+    public float sensitivity = 150f;
+    public float minPitch = -80f;
+    public float maxPitch = 80f;
+
+    [Header("Player")]
+    public Transform player;
+
+    [Header("Camera")]
+    public CameraInitial cameraInitial;
 
     private Camera cam;
-    private PlayerController playerController;
     private Renderer[] playerRenderers;
 
-    private bool isZoomed = false;
-    private float cameraPitch;
+    private bool isZoomed;
+    private float pitch;
+
+    void Awake()
+    {
+        cam = GetComponent<Camera>();
+    }
 
     void Start()
     {
-        cam = GetComponent<Camera>();
-
         if (cam == null)
         {
-            Debug.LogError("CameraZoom needs to be attached to a Camera.");
+            Debug.LogError(
+                "CameraZoom must be attached to Main Camera."
+            );
+
+            enabled = false;
             return;
         }
 
-        playerController = GetComponentInParent<PlayerController>();
-
-        if (playerController != null)
+        if (player != null)
         {
-            playerRenderers = playerController.GetComponentsInChildren<Renderer>();
+            playerRenderers =
+                player.GetComponentsInChildren<Renderer>();
         }
 
         cam.fieldOfView = normalFOV;
@@ -40,7 +53,7 @@ public class CameraZoom : MonoBehaviour
 
     void Update()
     {
-        if (Keyboard.current == null || cam == null)
+        if (Keyboard.current == null)
             return;
 
         if (Keyboard.current[zoomKey].wasPressedThisFrame)
@@ -50,8 +63,23 @@ public class CameraZoom : MonoBehaviour
 
         if (isZoomed)
         {
-            SniperLook();
+            Look();
         }
+    }
+
+    void LateUpdate()
+    {
+        if (!isZoomed || player == null)
+            return;
+
+        transform.position = player.position;
+
+        transform.rotation =
+            Quaternion.Euler(
+                pitch,
+                player.eulerAngles.y,
+                0f
+            );
     }
 
     void ToggleZoom()
@@ -60,17 +88,70 @@ public class CameraZoom : MonoBehaviour
 
         if (isZoomed)
         {
+            if (cameraInitial != null)
+                cameraInitial.IsActive = false;
+
             cam.fieldOfView = zoomFOV;
-            SetPlayerVisibility(false);
+
+            SetPlayerVisible(false);
+
+            pitch = 0f;
+
+            transform.position = player.position;
+
+            transform.rotation =
+                Quaternion.Euler(
+                    0f,
+                    player.eulerAngles.y,
+                    0f
+                );
         }
         else
         {
+            if (cameraInitial != null)
+                cameraInitial.IsActive = true;
+
             cam.fieldOfView = normalFOV;
-            SetPlayerVisibility(true);
+
+            SetPlayerVisible(true);
         }
     }
 
-    void SetPlayerVisibility(bool visible)
+    void Look()
+    {
+        if (Mouse.current == null || player == null)
+            return;
+
+        Vector2 delta =
+            Mouse.current.delta.ReadValue();
+
+        float mouseX =
+            delta.x *
+            sensitivity *
+            Time.deltaTime;
+
+        float mouseY =
+            delta.y *
+            sensitivity *
+            Time.deltaTime;
+
+        player.Rotate(
+            0f,
+            mouseX,
+            0f
+        );
+
+        pitch -= mouseY;
+
+        pitch =
+            Mathf.Clamp(
+                pitch,
+                minPitch,
+                maxPitch
+            );
+    }
+
+    void SetPlayerVisible(bool visible)
     {
         if (playerRenderers == null)
             return;
@@ -79,24 +160,5 @@ public class CameraZoom : MonoBehaviour
         {
             renderer.enabled = visible;
         }
-    }
-
-    void SniperLook()
-    {
-        Vector2 delta = Mouse.current.delta.ReadValue();
-
-        float mouseX = delta.x * zoomSensitivity * Time.deltaTime;
-        float mouseY = delta.y * zoomSensitivity * Time.deltaTime;
-
-        transform.parent.Rotate(0f, mouseX, 0f);
-
-        cameraPitch -= mouseY;
-        cameraPitch = Mathf.Clamp(cameraPitch, -80f, 80f);
-
-        transform.localEulerAngles = new Vector3(
-            cameraPitch,
-            0f,
-            0f
-        );
     }
 }

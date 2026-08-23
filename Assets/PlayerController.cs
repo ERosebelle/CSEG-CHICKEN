@@ -5,30 +5,25 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 5f;
-    public float jumpForce = 5f;
+    public float walkSpeed = 5f;
+    public float runSpeed = 9f;
 
-    [Header("Mouse Look")]
-    public float mouseSensitivity = 200f;
-    public Transform playerCamera;
+    [Header("Jump")]
+    public float normalJumpForce = 5f;
+    public float highJumpForce = 10f;
+    public float maxHoldTime = 0.6f;
 
     private Rigidbody rb;
     private Vector2 moveInput;
-    private float cameraPitch;
+
     private bool isGrounded;
+    private bool isHoldingJump;
+    private float jumpHoldTime;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-
         rb.freezeRotation = true;
-
-        if (playerCamera == null)
-        {
-            Camera cam = GetComponentInChildren<Camera>();
-            if (cam != null)
-                playerCamera = cam.transform;
-        }
     }
 
     void Start()
@@ -39,39 +34,76 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        Look();
-
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isGrounded = false;
-        }
+        HandleJump();
     }
 
     void FixedUpdate()
     {
-        Vector3 move = (transform.forward * moveInput.y +
-                        transform.right * moveInput.x) * moveSpeed;
+        float currentSpeed = walkSpeed;
 
-        rb.linearVelocity = new Vector3(move.x, rb.linearVelocity.y, move.z);
+        if (Keyboard.current.leftShiftKey.isPressed ||
+            Keyboard.current.rightShiftKey.isPressed)
+        {
+            currentSpeed = runSpeed;
+        }
+
+        Vector3 move =
+            (transform.forward * moveInput.y +
+             transform.right * moveInput.x) *
+            currentSpeed;
+
+        rb.linearVelocity = new Vector3(
+            move.x,
+            rb.linearVelocity.y,
+            move.z
+        );
     }
 
-    void Look()
+    void HandleJump()
     {
-        if (!Mouse.current.leftButton.isPressed)
-            return;
+        if (Keyboard.current.spaceKey.wasPressedThisFrame &&
+            isGrounded)
+        {
+            isHoldingJump = true;
+            jumpHoldTime = 0f;
 
-        Vector2 delta = Mouse.current.delta.ReadValue();
+            rb.AddForce(
+                Vector3.up * normalJumpForce,
+                ForceMode.Impulse
+            );
 
-        float mouseX = delta.x * mouseSensitivity * Time.deltaTime;
-        float mouseY = delta.y * mouseSensitivity * Time.deltaTime;
+            isGrounded = false;
+        }
 
-        transform.Rotate(0f, mouseX, 0f);
+        if (isHoldingJump &&
+            Keyboard.current.spaceKey.isPressed)
+        {
+            jumpHoldTime += Time.deltaTime;
 
-        cameraPitch -= mouseY;
-        cameraPitch = Mathf.Clamp(cameraPitch, -80f, 80f);
+            jumpHoldTime = Mathf.Clamp(
+                jumpHoldTime,
+                0f,
+                maxHoldTime
+            );
+        }
 
-        playerCamera.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
+        if (isHoldingJump &&
+            Keyboard.current.spaceKey.wasReleasedThisFrame)
+        {
+            isHoldingJump = false;
+
+            float holdPercent =
+                jumpHoldTime / maxHoldTime;
+
+            float extraForce =
+                (highJumpForce - normalJumpForce) *
+                holdPercent;
+
+            rb.AddForce(
+                Vector3.up * extraForce,
+                ForceMode.Impulse
+            );
+        }
     }
 
     public void OnMove(InputValue value)

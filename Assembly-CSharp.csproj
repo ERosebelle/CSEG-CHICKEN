@@ -51,8 +51,10 @@
     <Compile Include="Assets\ChickenAnimation.cs" />
     <Compile Include="Assets\CameraZoom.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\EnemyAI.cs" />
     <Compile Include="Assets\PlayerController.cs" />
     <Compile Include="Assets\PlayerShoot.cs" />
+    <Compile Include="Assets\CameraInitial.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
