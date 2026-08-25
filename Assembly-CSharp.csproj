@@ -48,16 +48,21 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Bullet.cs" />
-    <Compile Include="Assets\ChickenAnimation.cs" />
-    <Compile Include="Assets\CameraZoom.cs" />
+    <Compile Include="Assets\cs files\EnemyShooting.cs" />
+    <Compile Include="Assets\cs files\CameraZoom.cs" />
+    <Compile Include="Assets\cs files\MapColorObject.cs" />
+    <Compile Include="Assets\cs files\ChickenAnimation.cs" />
+    <Compile Include="Assets\cs files\Bullet.cs" />
+    <Compile Include="Assets\cs files\EnemyHealth.cs" />
+    <Compile Include="Assets\cs files\FloatingAnimation.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\EnemyAI.cs" />
-    <Compile Include="Assets\PlayerController.cs" />
-    <Compile Include="Assets\PlayerShoot.cs" />
-    <Compile Include="Assets\FloatingAnimation.cs" />
-    <Compile Include="Assets\EnemyShooting.cs" />
-    <Compile Include="Assets\CameraInitial.cs" />
+    <Compile Include="Assets\cs files\PlayerShoot.cs" />
+    <Compile Include="Assets\cs files\PlayerController.cs" />
+    <Compile Include="Assets\cs files\PlayerBullet.cs" />
+    <Compile Include="Assets\cs files\EnemyColorWeakness.cs" />
+    <Compile Include="Assets\cs files\PlayerFallTeleport.cs" />
+    <Compile Include="Assets\cs files\EnemyAI.cs" />
+    <Compile Include="Assets\cs files\CameraInitial.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
