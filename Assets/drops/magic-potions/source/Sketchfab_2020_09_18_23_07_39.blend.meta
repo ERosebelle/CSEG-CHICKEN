@@ -3,7 +3,77 @@ guid: 6754e05c03ddd3b4584f208ac940eb1d
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.002
+    second: {fileID: 2100000, guid: f36d0430f73342b47bd980f06e7ce9a2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.003
+    second: {fileID: 2100000, guid: 211bcaaed46311d46b949bd4294f1cf7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.008
+    second: {fileID: 2100000, guid: 14d968f8f86a44843b5585dfe147f012, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.010
+    second: {fileID: 2100000, guid: 4b0ca66c98946174898f51c1d68c5e1f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: cork
+    second: {fileID: 2100000, guid: 625627868e687c34c9a3d1b37942d1e8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: cork2
+    second: {fileID: 2100000, guid: 1b1165e825b71cb4299d226804591b84, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: glass_blue
+    second: {fileID: 2100000, guid: bc6bb3cb21ecfb747add24da03ff2f7e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: glass_green
+    second: {fileID: 2100000, guid: 16a676c13b2cd644aa9b1ee7b52b251e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: glass_purple
+    second: {fileID: 2100000, guid: ad788030f5c4ec74f959ee6c800a0098, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: glass_yellow
+    second: {fileID: 2100000, guid: cec176726dfe1c84ab5121281bb83b90, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: leather_brown
+    second: {fileID: 2100000, guid: afa3f9a6000b2124b9e1c7683ac9935c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: leather_pink
+    second: {fileID: 2100000, guid: 67a3f464515e3b845af43e3a1915ab9b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: leather_purple
+    second: {fileID: 2100000, guid: 70610834b05da534888c50f18a06a4a8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: leather_red
+    second: {fileID: 2100000, guid: 4293b5fbbfb21ee409f70206edfe28ad, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

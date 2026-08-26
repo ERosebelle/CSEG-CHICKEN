@@ -308,7 +308,7 @@ public class PlayerShoot : MonoBehaviour
         if (playerBullet != null)
         {
             playerBullet.bulletColor =
-                GetCurrentColor();
+                GetCurrentBulletColor();
         }
         else
         {
@@ -346,7 +346,11 @@ public class PlayerShoot : MonoBehaviour
         }
     }
 
-    Color GetCurrentColor()
+    // ==========================================
+    // GET CURRENT BULLET COLOR
+    // ==========================================
+
+    public Color GetCurrentBulletColor()
     {
         switch (currentBulletColor)
         {

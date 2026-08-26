@@ -3,7 +3,22 @@ guid: 2c0af6294c213b24892bfa4e15df1d63
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: fire
+    second: {fileID: 2100000, guid: e526329c17c4d6e45bb195e0604474c0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: flask
+    second: {fileID: 2100000, guid: b3ee9647a8973c44bb19ab7337fba091, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rope
+    second: {fileID: 2100000, guid: 2d7f88014ca1dd349811a9aa46b8ae42, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

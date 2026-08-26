@@ -49,17 +49,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\cs files\EnemyShooting.cs" />
+    <Compile Include="Assets\cs files\DominoPulse.cs" />
+    <Compile Include="Assets\cs files\MusicManager.cs" />
+    <Compile Include="Assets\cs files\LurkingNPC.cs" />
     <Compile Include="Assets\cs files\CameraZoom.cs" />
+    <Compile Include="Assets\cs files\ResponsiveHUDBorder.cs" />
     <Compile Include="Assets\cs files\MapColorObject.cs" />
     <Compile Include="Assets\cs files\ChickenAnimation.cs" />
     <Compile Include="Assets\cs files\Bullet.cs" />
     <Compile Include="Assets\cs files\EnemyHealth.cs" />
+    <Compile Include="Assets\cs files\AmmoColorUI.cs" />
     <Compile Include="Assets\cs files\FloatingAnimation.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\cs files\PlayerShoot.cs" />
     <Compile Include="Assets\cs files\PlayerController.cs" />
     <Compile Include="Assets\cs files\PlayerBullet.cs" />
     <Compile Include="Assets\cs files\EnemyColorWeakness.cs" />
+    <Compile Include="Assets\cs files\PotionDropSpawner.cs" />
     <Compile Include="Assets\cs files\PlayerFallTeleport.cs" />
     <Compile Include="Assets\cs files\EnemyAI.cs" />
     <Compile Include="Assets\cs files\CameraInitial.cs" />
