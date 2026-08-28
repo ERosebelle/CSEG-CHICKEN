@@ -15,6 +15,9 @@ public class EnemyColorWeakness : MonoBehaviour
 
     private EnemyHealth enemyHealth;
 
+    private static WeaknessColor lastWeakness;
+    private static bool hasPreviousWeakness = false;
+
     void Start()
     {
         // ==========================================
@@ -31,31 +34,31 @@ public class EnemyColorWeakness : MonoBehaviour
         }
 
         if (enemyHealth == null)
-        {
-            Debug.LogError(
-                "EnemyColorWeakness: EnemyHealth NOT FOUND on " +
-                gameObject.name
-            );
-
             return;
-        }
 
         // ==========================================
         // RANDOM WEAKNESS
         // ==========================================
 
-        weakness =
-            (WeaknessColor)Random.Range(
-                0,
-                4
-            );
+        WeaknessColor newWeakness;
 
-        Debug.Log(
-            "ENEMY WEAKNESS | " +
-            gameObject.name +
-            " | WEAKNESS: " +
-            GetWeaknessName()
+        do
+        {
+            newWeakness =
+                (WeaknessColor)Random.Range(
+                    0,
+                    4
+                );
+
+        } while (
+            hasPreviousWeakness &&
+            newWeakness == lastWeakness
         );
+
+        weakness = newWeakness;
+
+        lastWeakness = weakness;
+        hasPreviousWeakness = true;
 
         // ==========================================
         // CHANGE EXISTING HEART COLORS
@@ -104,16 +107,12 @@ public class EnemyColorWeakness : MonoBehaviour
         Renderer[] renderers =
             heart.GetComponentsInChildren<Renderer>();
 
-        foreach (
-            Renderer renderer
-            in renderers
-        )
+        foreach (Renderer renderer in renderers)
         {
             if (renderer == null)
                 continue;
 
-            renderer.material.color =
-                color;
+            renderer.material.color = color;
         }
     }
 

@@ -17,15 +17,22 @@ public class EnemyHealth : MonoBehaviour
     public float regenerationPerSecond = 5f;
     public float regenerationRadius = 10f;
 
+    [Header("Drops")]
+    public GameObject mysteryPotion;
+    public GameObject healthPotion;
+    public GameObject ammoPotion;
+
+    [Header("Drop Spawn Site")]
+    public Transform spawnPotion;
+
+    [Header("Enemy Counter")]
+    public EnemyCounter enemyCounter;
+
     private float currentHealth;
     private bool isDefeated;
 
     private bool wasRegenerating;
     private bool wasRegenerationBlocked;
-
-    // ==========================================
-    // START
-    // ==========================================
 
     void Start()
     {
@@ -35,20 +42,18 @@ public class EnemyHealth : MonoBehaviour
         wasRegenerating = false;
         wasRegenerationBlocked = false;
 
+        // ==========================================
+        // FIND ENEMY COUNTER AUTOMATICALLY
+        // ==========================================
+
+        if (enemyCounter == null)
+        {
+            enemyCounter =
+                FindFirstObjectByType<EnemyCounter>();
+        }
+
         UpdateHeartModels();
-
-        Debug.Log(
-            "ENEMY HEALTH START | " +
-            gameObject.name +
-            " | HEALTH: " +
-            GetHealthPercent().ToString("F2") +
-            "%"
-        );
     }
-
-    // ==========================================
-    // UPDATE
-    // ==========================================
 
     void Update()
     {
@@ -59,7 +64,7 @@ public class EnemyHealth : MonoBehaviour
     }
 
     // ==========================================
-    // DAMAGE
+    // TAKE DAMAGE
     // ==========================================
 
     public void TakeDamage()
@@ -69,22 +74,13 @@ public class EnemyHealth : MonoBehaviour
 
         currentHealth -= damagePerHit;
 
-        currentHealth =
-            Mathf.Clamp(
-                currentHealth,
-                0f,
-                maxHealth
-            );
+        currentHealth = Mathf.Clamp(
+            currentHealth,
+            0f,
+            maxHealth
+        );
 
         UpdateHeartModels();
-
-        Debug.Log(
-            "ENEMY DAMAGE | " +
-            gameObject.name +
-            " | HEALTH: " +
-            GetHealthPercent().ToString("F2") +
-            "%"
-        );
 
         if (currentHealth <= 0f)
         {
@@ -106,10 +102,6 @@ public class EnemyHealth : MonoBehaviour
             return;
         }
 
-        // ==========================================
-        // FIND ENEMY WEAKNESS
-        // ==========================================
-
         EnemyColorWeakness enemyWeakness =
             GetComponent<EnemyColorWeakness>();
 
@@ -120,18 +112,7 @@ public class EnemyHealth : MonoBehaviour
         }
 
         if (enemyWeakness == null)
-        {
-            Debug.LogWarning(
-                "REGENERATION FAILED | EnemyColorWeakness NOT FOUND | " +
-                gameObject.name
-            );
-
             return;
-        }
-
-        // ==========================================
-        // FIND NEARBY OBJECTS
-        // ==========================================
 
         Collider[] nearbyObjects =
             Physics.OverlapSphere(
@@ -141,23 +122,10 @@ public class EnemyHealth : MonoBehaviour
 
         bool weaknessColorFound = false;
 
-        MapColorObject blockingObject = null;
-
-        // ==========================================
-        // CHECK EACH OBJECT
-        // ==========================================
-
-        foreach (
-            Collider nearbyCollider
-            in nearbyObjects
-        )
+        foreach (Collider nearbyCollider in nearbyObjects)
         {
             if (nearbyCollider == null)
                 continue;
-
-            // ==========================================
-            // IGNORE ENEMY
-            // ==========================================
 
             if (
                 nearbyCollider.transform == transform ||
@@ -166,10 +134,6 @@ public class EnemyHealth : MonoBehaviour
             {
                 continue;
             }
-
-            // ==========================================
-            // FIND MAP COLOR OBJECT
-            // ==========================================
 
             MapColorObject mapColorObject =
                 nearbyCollider.GetComponent<MapColorObject>();
@@ -183,10 +147,6 @@ public class EnemyHealth : MonoBehaviour
             if (mapColorObject == null)
                 continue;
 
-            // ==========================================
-            // CHECK COLOR
-            // ==========================================
-
             if (
                 enemyWeakness.IsWeaknessColor(
                     mapColorObject.GetCurrentColor()
@@ -194,107 +154,36 @@ public class EnemyHealth : MonoBehaviour
             )
             {
                 weaknessColorFound = true;
-
-                blockingObject =
-                    mapColorObject;
-
                 break;
             }
         }
 
-        // ==========================================
-        // WEAKNESS COLOR FOUND
-        // REGENERATION BLOCKED
-        // ==========================================
-
         if (weaknessColorFound)
         {
             wasRegenerating = false;
-
-            if (!wasRegenerationBlocked)
-            {
-                Debug.Log(
-                    "REGENERATION BLOCKED | " +
-                    "Enemy: " +
-                    gameObject.name +
-                    " | Weakness: " +
-                    enemyWeakness.GetWeaknessName() +
-                    " | Object: " +
-                    blockingObject.gameObject.name +
-                    " | Color: " +
-                    blockingObject.GetColorName()
-                );
-
-                wasRegenerationBlocked = true;
-            }
+            wasRegenerationBlocked = true;
 
             return;
         }
 
-        // ==========================================
-        // NO WEAKNESS COLOR FOUND
-        // REGENERATE
-        // ==========================================
-
         wasRegenerationBlocked = false;
-
-        if (!wasRegenerating)
-        {
-            Debug.Log(
-                "REGENERATION STARTED | " +
-                "Enemy: " +
-                gameObject.name +
-                " | Weakness: " +
-                enemyWeakness.GetWeaknessName() +
-                " | Rate: " +
-                regenerationPerSecond +
-                " HP/SECOND"
-            );
-
-            wasRegenerating = true;
-        }
-
-        // ==========================================
-        // APPLY REGENERATION
-        // ==========================================
-
-        float previousHealth =
-            currentHealth;
+        wasRegenerating = true;
 
         currentHealth +=
             regenerationPerSecond *
             Time.deltaTime;
 
-        currentHealth =
-            Mathf.Clamp(
-                currentHealth,
-                0f,
-                maxHealth
-            );
+        currentHealth = Mathf.Clamp(
+            currentHealth,
+            0f,
+            maxHealth
+        );
 
         UpdateHeartModels();
-
-        // ==========================================
-        // LOG EVERY 1 HP
-        // ==========================================
-
-        if (
-            Mathf.FloorToInt(previousHealth) !=
-            Mathf.FloorToInt(currentHealth)
-        )
-        {
-            Debug.Log(
-                "ENEMY REGENERATING | " +
-                gameObject.name +
-                " | HEALTH: " +
-                GetHealthPercent().ToString("F2") +
-                "%"
-            );
-        }
     }
 
     // ==========================================
-    // HEART MODELS
+    // UPDATE HEART MODELS
     // ==========================================
 
     void UpdateHeartModels()
@@ -305,10 +194,6 @@ public class EnemyHealth : MonoBehaviour
         float healthPercent =
             GetHealthPercent() * 100f;
 
-        // ==========================================
-        // HEART 1
-        // ==========================================
-
         if (heartModel1 != null)
         {
             heartModel1.SetActive(
@@ -316,20 +201,12 @@ public class EnemyHealth : MonoBehaviour
             );
         }
 
-        // ==========================================
-        // HEART 2
-        // ==========================================
-
         if (heartModel2 != null)
         {
             heartModel2.SetActive(
                 healthPercent > 33.33f
             );
         }
-
-        // ==========================================
-        // HEART 3
-        // ==========================================
 
         if (heartModel3 != null)
         {
@@ -345,17 +222,61 @@ public class EnemyHealth : MonoBehaviour
 
     void Defeat()
     {
+        if (isDefeated)
+            return;
+
         isDefeated = true;
         currentHealth = 0f;
 
         UpdateHeartModels();
 
-        Debug.Log(
-            "ENEMY DEFEATED | " +
-            gameObject.name
-        );
+        // ==========================================
+        // SEND DEFEAT TO ENEMY COUNTER
+        // ==========================================
+
+        if (enemyCounter == null)
+        {
+            enemyCounter =
+                FindFirstObjectByType<EnemyCounter>();
+        }
+
+        if (enemyCounter != null)
+        {
+            enemyCounter.EnemyDefeated();
+        }
+
+        SpawnDrops();
 
         Destroy(gameObject);
+    }
+
+    // ==========================================
+    // SPAWN DROPS
+    // ==========================================
+
+    void SpawnDrops()
+    {
+        if (spawnPotion == null)
+            return;
+
+        SpawnDrop(mysteryPotion);
+        SpawnDrop(healthPotion);
+        SpawnDrop(ammoPotion);
+    }
+
+    void SpawnDrop(GameObject dropPrefab)
+    {
+        if (dropPrefab == null)
+            return;
+
+        GameObject spawnedDrop =
+            Instantiate(
+                dropPrefab,
+                spawnPotion.position,
+                spawnPotion.rotation
+            );
+
+        spawnedDrop.SetActive(true);
     }
 
     // ==========================================
@@ -389,7 +310,7 @@ public class EnemyHealth : MonoBehaviour
     }
 
     // ==========================================
-    // REGENERATION RANGE VISUAL
+    // REGENERATION GIZMO
     // ==========================================
 
     void OnDrawGizmosSelected()

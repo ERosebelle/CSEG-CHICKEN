@@ -35,11 +35,6 @@ public class EnemyShooting : MonoBehaviour
         );
 
         shootTimer = 0f;
-
-        Debug.Log(
-            "Enemy Bullet Count: " +
-            currentBullets
-        );
     }
 
     void Update()
@@ -80,23 +75,9 @@ public class EnemyShooting : MonoBehaviour
     public void AddBullet()
     {
         if (currentBullets >= maxBullets)
-        {
-            Debug.Log(
-                "Enemy Bullet Count already MAX: " +
-                currentBullets
-            );
-
             return;
-        }
 
         currentBullets++;
-
-        Debug.Log(
-            "WRONG COLOR HIT | " +
-            "Enemy Bullet Count +1 | " +
-            "Current Count: " +
-            currentBullets
-        );
     }
 
     // ==========================================
@@ -139,80 +120,55 @@ public class EnemyShooting : MonoBehaviour
     // SHOOT
     // ==========================================
 
-void Shoot()
-{
-    if (bullet == null)
+    void Shoot()
     {
-        Debug.LogError(
-            "EnemyShooting: Bullet is NOT assigned!"
-        );
+        if (bullet == null)
+            return;
 
-        return;
-    }
+        if (firePoint == null)
+            return;
 
-    if (firePoint == null)
-    {
-        Debug.LogError(
-            "EnemyShooting: Fire Point is NOT assigned!"
-        );
+        Vector3 shootDirection =
+            enemyTarget.position -
+            firePoint.position;
 
-        return;
-    }
+        if (shootDirection.sqrMagnitude <= 0.01f)
+            return;
 
-    Vector3 shootDirection =
-        enemyTarget.position -
-        firePoint.position;
+        shootDirection.Normalize();
 
-    if (shootDirection.sqrMagnitude <= 0.01f)
-        return;
-
-    shootDirection.Normalize();
-
-    Debug.Log(
-        "ENEMY ATTACK | " +
-        "Bullet Count: " +
-        currentBullets
-    );
-
-    for (int i = 0; i < currentBullets; i++)
-    {
-        Vector3 direction =
-            shootDirection;
-
-        // Spread multiple bullets
-        if (currentBullets > 1)
+        for (int i = 0; i < currentBullets; i++)
         {
-            float spread =
-                (i - (currentBullets - 1) / 2f) * 5f;
-
-            direction =
-                Quaternion.AngleAxis(
-                    spread,
-                    Vector3.up
-                ) *
+            Vector3 direction =
                 shootDirection;
+
+            // Spread multiple bullets
+            if (currentBullets > 1)
+            {
+                float spread =
+                    (i - (currentBullets - 1) / 2f) * 5f;
+
+                direction =
+                    Quaternion.AngleAxis(
+                        spread,
+                        Vector3.up
+                    ) *
+                    shootDirection;
+            }
+
+            GameObject newBullet =
+                Instantiate(
+                    bullet,
+                    firePoint.position,
+                    Quaternion.LookRotation(
+                        direction
+                    )
+                );
+
+            newBullet.transform.localScale =
+                bullet.transform.localScale;
+
+            newBullet.SetActive(true);
         }
-
-        GameObject newBullet =
-            Instantiate(
-                bullet,
-                firePoint.position,
-                Quaternion.LookRotation(
-                    direction
-                )
-            );
-
-        newBullet.transform.localScale =
-            bullet.transform.localScale;
-
-        newBullet.SetActive(true);
-
-        Debug.Log(
-            "Bullet " +
-            (i + 1) +
-            " / " +
-            currentBullets +
-            " spawned"
-        );
     }
-}}
+}

@@ -133,16 +133,6 @@ public class PlayerBullet : MonoBehaviour
 
                         if (correctColor)
                         {
-                            Debug.Log(
-                                "CORRECT COLOR HIT | " +
-                                "Enemy: " +
-                                enemyHealth.gameObject.name +
-                                " | Bullet: " +
-                                GetBulletColorName() +
-                                " | Weakness: " +
-                                enemyWeakness.GetWeaknessName()
-                            );
-
                             enemyHealth.TakeDamage();
                         }
 
@@ -152,20 +142,6 @@ public class PlayerBullet : MonoBehaviour
 
                         else
                         {
-                            Debug.Log(
-                                "WRONG COLOR HIT | " +
-                                "Enemy: " +
-                                enemyHealth.gameObject.name +
-                                " | Bullet: " +
-                                GetBulletColorName() +
-                                " | Weakness: " +
-                                enemyWeakness.GetWeaknessName()
-                            );
-
-                            // ==========================================
-                            // ADD ENEMY BULLET
-                            // ==========================================
-
                             EnemyShooting enemyShooting =
                                 enemyHealth.GetComponent<EnemyShooting>();
 
@@ -179,21 +155,7 @@ public class PlayerBullet : MonoBehaviour
                             {
                                 enemyShooting.AddBullet();
                             }
-                            else
-                            {
-                                Debug.LogWarning(
-                                    "EnemyShooting NOT FOUND on: " +
-                                    enemyHealth.gameObject.name
-                                );
-                            }
                         }
-                    }
-                    else
-                    {
-                        Debug.LogWarning(
-                            "EnemyColorWeakness NOT FOUND on: " +
-                            enemyHealth.gameObject.name
-                        );
                     }
 
                     // ==========================================
@@ -312,18 +274,8 @@ public class PlayerBullet : MonoBehaviour
 
         if (mapColorObject != null)
         {
-            Debug.Log(
-                "MAP COLOR OBJECT FOUND: " +
-                mapColorObject.gameObject.name
-            );
-
             mapColorObject.ApplyColor(
                 bulletColor
-            );
-
-            Debug.Log(
-                "MAP OBJECT COLOR: " +
-                mapColorObject.GetColorName()
             );
 
             return;
@@ -393,11 +345,6 @@ public class PlayerBullet : MonoBehaviour
         {
             mapColorObject =
                 colorObject.AddComponent<MapColorObject>();
-
-            Debug.Log(
-                "MAP COLOR OBJECT AUTOMATICALLY ADDED: " +
-                colorObject.name
-            );
         }
 
         // ==========================================
@@ -406,14 +353,6 @@ public class PlayerBullet : MonoBehaviour
 
         mapColorObject.ApplyColor(
             bulletColor
-        );
-
-        Debug.Log(
-            "MAP OBJECT REGISTERED | " +
-            "Object: " +
-            colorObject.name +
-            " | Color: " +
-            mapColorObject.GetColorName()
         );
     }
 

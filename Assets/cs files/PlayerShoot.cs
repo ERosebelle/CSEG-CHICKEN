@@ -22,10 +22,19 @@ public class PlayerShoot : MonoBehaviour
     public GameObject greenBullet;
     public GameObject yellowBullet;
 
+    [Header("Ammo")]
+    public AmmoCount ammoCount;
+
+    [Header("Potion Counts")]
+    public RedCount redCount;
+    public BlueCount blueCount;
+    public GreenCount greenCount;
+    public YellowCount yellowCount;
+
     [Header("Aim")]
     public float aimDistance = 1000f;
 
-    private int currentBulletColor = 1;
+    private int currentBulletColor = 0;
 
     void Start()
     {
@@ -34,42 +43,9 @@ public class PlayerShoot : MonoBehaviour
             playerCamera = Camera.main;
         }
 
-        if (playerCamera == null)
-        {
-            Debug.LogError(
-                "PlayerShoot: Player Camera is NOT assigned and Main Camera was not found!"
-            );
-        }
-
-        if (cameraInitial == null)
-        {
-            Debug.LogError(
-                "PlayerShoot: CameraInitial is NOT assigned!"
-            );
-        }
-
-        if (cameraZoom == null)
-        {
-            Debug.LogError(
-                "PlayerShoot: CameraZoom is NOT assigned!"
-            );
-        }
-
-        if (bulletSpawnSpot == null)
-        {
-            Debug.LogError(
-                "PlayerShoot: Bullet Spawn Spot is NOT assigned!"
-            );
-        }
-
-        if (zoomBulletSpawnSpot == null)
-        {
-            Debug.LogError(
-                "PlayerShoot: Zoom Bullet Spawn Spot is NOT assigned!"
-            );
-        }
-
         DisableAllBullets();
+
+        SelectFirstAvailableColor();
     }
 
     void Update()
@@ -78,33 +54,25 @@ public class PlayerShoot : MonoBehaviour
             Mouse.current == null)
             return;
 
-        // ==========================================
-        // BULLET COLOR
-        // ==========================================
-
         if (Keyboard.current.digit1Key.wasPressedThisFrame)
         {
-            currentBulletColor = 1;
+            TrySelectColor(1);
         }
 
         if (Keyboard.current.digit2Key.wasPressedThisFrame)
         {
-            currentBulletColor = 2;
+            TrySelectColor(2);
         }
 
         if (Keyboard.current.digit3Key.wasPressedThisFrame)
         {
-            currentBulletColor = 3;
+            TrySelectColor(3);
         }
 
         if (Keyboard.current.digit4Key.wasPressedThisFrame)
         {
-            currentBulletColor = 4;
+            TrySelectColor(4);
         }
-
-        // ==========================================
-        // RIGHT MOUSE BUTTON = SHOOT
-        // ==========================================
 
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
@@ -112,91 +80,91 @@ public class PlayerShoot : MonoBehaviour
         }
     }
 
-    void Shoot()
+    void TrySelectColor(int color)
     {
-        // ==========================================
-        // CAMERA CHECK
-        // ==========================================
+        if (color == currentBulletColor)
+            return;
 
-        if (playerCamera == null)
+        if (!HasPotion(color))
+            return;
+
+        RemovePotion(color);
+
+        currentBulletColor = color;
+    }
+
+    void SelectFirstAvailableColor()
+    {
+        if (HasPotion(1))
         {
-            Debug.LogError(
-                "PlayerShoot: Player Camera is NOT assigned!"
-            );
-
+            currentBulletColor = 1;
             return;
         }
 
-        // ==========================================
-        // DETERMINE CAMERA STATE
-        // ==========================================
+        if (HasPotion(2))
+        {
+            currentBulletColor = 2;
+            return;
+        }
+
+        if (HasPotion(3))
+        {
+            currentBulletColor = 3;
+            return;
+        }
+
+        if (HasPotion(4))
+        {
+            currentBulletColor = 4;
+            return;
+        }
+
+        currentBulletColor = 0;
+    }
+
+    void Shoot()
+    {
+        if (ammoCount == null)
+            return;
+
+        if (ammoCount.GetAmmoCount() <= 0)
+            return;
+
+        if (currentBulletColor == 0)
+            return;
+
+        if (playerCamera == null)
+            return;
 
         bool isZoomed =
             cameraZoom != null &&
             cameraInitial != null &&
             !cameraInitial.IsActive;
 
-        // ==========================================
-        // DETERMINE SPAWN POINT
-        // ==========================================
-
         Transform currentSpawnPoint;
 
         if (isZoomed)
         {
-            currentSpawnPoint =
-                zoomBulletSpawnSpot;
-
-            if (currentSpawnPoint == null)
-            {
-                Debug.LogError(
-                    "PlayerShoot: Zoom Bullet Spawn Spot is NOT assigned!"
-                );
-
-                return;
-            }
+            currentSpawnPoint = zoomBulletSpawnSpot;
         }
         else
         {
-            currentSpawnPoint =
-                bulletSpawnSpot;
-
-            if (currentSpawnPoint == null)
-            {
-                Debug.LogError(
-                    "PlayerShoot: Bullet Spawn Spot is NOT assigned!"
-                );
-
-                return;
-            }
+            currentSpawnPoint = bulletSpawnSpot;
         }
 
-        // ==========================================
-        // GET SELECTED BULLET
-        // ==========================================
+        if (currentSpawnPoint == null)
+            return;
 
         GameObject selectedBullet =
             GetSelectedBullet();
 
         if (selectedBullet == null)
-        {
-            Debug.LogError(
-                "PlayerShoot: Selected Bullet is NOT assigned!"
-            );
-
             return;
-        }
 
         Vector3 shootDirection;
 
-        // ==========================================
-        // INITIAL CAMERA
-        // ==========================================
-
         if (!isZoomed)
         {
-            Vector3 targetPoint;
-
             Vector2 mousePosition =
                 Mouse.current.position.ReadValue();
 
@@ -207,17 +175,15 @@ public class PlayerShoot : MonoBehaviour
 
             RaycastHit hit;
 
+            Vector3 targetPoint;
+
             if (Physics.Raycast(
                 ray,
                 out hit,
-                aimDistance))
+                aimDistance
+            ))
             {
                 targetPoint = hit.point;
-
-                Debug.Log(
-                    "AIM HIT OBJECT: " +
-                    hit.collider.gameObject.name
-                );
             }
             else
             {
@@ -225,10 +191,6 @@ public class PlayerShoot : MonoBehaviour
                     ray.origin +
                     ray.direction *
                     aimDistance;
-
-                Debug.Log(
-                    "AIM DID NOT HIT AN OBJECT"
-                );
             }
 
             shootDirection =
@@ -240,10 +202,6 @@ public class PlayerShoot : MonoBehaviour
 
             shootDirection.Normalize();
 
-            // ==========================================
-            // INITIAL CAMERA FRONT CHECK
-            // ==========================================
-
             float frontCheck =
                 Vector3.Dot(
                     currentSpawnPoint.forward,
@@ -251,30 +209,15 @@ public class PlayerShoot : MonoBehaviour
                 );
 
             if (frontCheck <= 0f)
-            {
                 return;
-            }
         }
-
-        // ==========================================
-        // ZOOM CAMERA
-        // ==========================================
-
         else
         {
             shootDirection =
                 playerCamera.transform.forward;
 
             shootDirection.Normalize();
-
-            Debug.Log(
-                "ZOOM AIM ACTIVE - CAMERA FORWARD USED"
-            );
         }
-
-        // ==========================================
-        // CREATE NEW BULLET
-        // ==========================================
 
         GameObject newBullet =
             Instantiate(
@@ -285,22 +228,10 @@ public class PlayerShoot : MonoBehaviour
                 )
             );
 
-        // ==========================================
-        // PRESERVE ORIGINAL BULLET SCALE
-        // ==========================================
-
         newBullet.transform.localScale =
             selectedBullet.transform.localScale;
 
-        // ==========================================
-        // MAKE BULLET VISIBLE
-        // ==========================================
-
         newBullet.SetActive(true);
-
-        // ==========================================
-        // SET BULLET COLOR
-        // ==========================================
 
         PlayerBullet playerBullet =
             newBullet.GetComponent<PlayerBullet>();
@@ -310,19 +241,65 @@ public class PlayerShoot : MonoBehaviour
             playerBullet.bulletColor =
                 GetCurrentBulletColor();
         }
-        else
+
+        ammoCount.RemoveAmmo();
+    }
+
+    bool HasPotion(int color)
+    {
+        switch (color)
         {
-            Debug.LogError(
-                "PlayerShoot: Selected bullet has NO PlayerBullet component!"
-            );
+            case 1:
+                return redCount != null &&
+                       redCount.GetRedPotionCount() > 0;
+
+            case 2:
+                return blueCount != null &&
+                       blueCount.GetBluePotionCount() > 0;
+
+            case 3:
+                return greenCount != null &&
+                       greenCount.GetGreenPotionCount() > 0;
+
+            case 4:
+                return yellowCount != null &&
+                       yellowCount.GetYellowPotionCount() > 0;
+
+            default:
+                return false;
+        }
+    }
+
+    void RemovePotion(int color)
+    {
+        switch (color)
+        {
+            case 1:
+                if (redCount != null)
+                    redCount.RemoveRedPotion();
+                break;
+
+            case 2:
+                if (blueCount != null)
+                    blueCount.RemoveBluePotion();
+                break;
+
+            case 3:
+                if (greenCount != null)
+                    greenCount.RemoveGreenPotion();
+                break;
+
+            case 4:
+                if (yellowCount != null)
+                    yellowCount.RemoveYellowPotion();
+                break;
         }
 
-        Debug.Log(
-            "PLAYER BULLET FIRED: " +
-            newBullet.name +
-            " | SCALE: " +
-            newBullet.transform.localScale
-        );
+        if (currentBulletColor == color &&
+            !HasPotion(color))
+        {
+            SelectFirstAvailableColor();
+        }
     }
 
     GameObject GetSelectedBullet()
@@ -346,10 +323,6 @@ public class PlayerShoot : MonoBehaviour
         }
     }
 
-    // ==========================================
-    // GET CURRENT BULLET COLOR
-    // ==========================================
-
     public Color GetCurrentBulletColor()
     {
         switch (currentBulletColor)
@@ -367,7 +340,7 @@ public class PlayerShoot : MonoBehaviour
                 return Color.yellow;
 
             default:
-                return Color.red;
+                return Color.white;
         }
     }
 

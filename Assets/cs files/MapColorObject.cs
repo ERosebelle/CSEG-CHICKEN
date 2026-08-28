@@ -11,13 +11,6 @@ public class MapColorObject : MonoBehaviour
     {
         renderers =
             GetComponentsInChildren<Renderer>();
-
-        Debug.Log(
-            "MapColorObject detected: " +
-            gameObject.name +
-            " | Renderers: " +
-            renderers.Length
-        );
     }
 
     // ==========================================
@@ -43,14 +36,6 @@ public class MapColorObject : MonoBehaviour
             renderer.material.color =
                 newColor;
         }
-
-        Debug.Log(
-            "MapColorObject COLOR CHANGED | " +
-            "Object: " +
-            gameObject.name +
-            " | New Color: " +
-            GetColorName(newColor)
-        );
     }
 
     // ==========================================

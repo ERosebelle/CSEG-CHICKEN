@@ -44,13 +44,6 @@ public class EnemyAI : MonoBehaviour
         hitDetectionActive = false;
 
         enemyBulletCount = startingBulletCount;
-
-        Debug.Log(
-            "ENEMY BULLET COUNT | " +
-            gameObject.name +
-            " | START: " +
-            enemyBulletCount
-        );
     }
 
     void Update()
@@ -70,11 +63,6 @@ public class EnemyAI : MonoBehaviour
             {
                 hitDetectionTimer = 0f;
                 hitDetectionActive = false;
-
-                Debug.Log(
-                    "ENEMY HIT DETECTION ENDED | " +
-                    gameObject.name
-                );
             }
         }
 
@@ -134,14 +122,6 @@ public class EnemyAI : MonoBehaviour
 
         hitDetectionTimer =
             hitDetectionDuration;
-
-        Debug.Log(
-            "ENEMY HIT | " +
-            gameObject.name +
-            " | PLAYER DETECTION FOR " +
-            hitDetectionDuration +
-            " SECONDS"
-        );
     }
 
     // ==========================================
@@ -151,13 +131,6 @@ public class EnemyAI : MonoBehaviour
     public void AddEnemyBullet()
     {
         enemyBulletCount++;
-
-        Debug.Log(
-            "WRONG COLOR PENALTY | " +
-            gameObject.name +
-            " | ENEMY BULLET COUNT: " +
-            enemyBulletCount
-        );
     }
 
     // ==========================================
@@ -177,22 +150,10 @@ public class EnemyAI : MonoBehaviour
     {
         if (enemyBulletCount <= 0)
         {
-            Debug.Log(
-                "NO ENEMY BULLETS AVAILABLE | " +
-                gameObject.name
-            );
-
             return false;
         }
 
         enemyBulletCount--;
-
-        Debug.Log(
-            "ENEMY BULLET USED | " +
-            gameObject.name +
-            " | REMAINING: " +
-            enemyBulletCount
-        );
 
         return true;
     }

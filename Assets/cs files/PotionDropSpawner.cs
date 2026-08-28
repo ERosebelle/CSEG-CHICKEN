@@ -33,7 +33,6 @@ public class PotionDropSpawner : MonoBehaviour
 
     private int currentGroundPotions;
 
-
     // ==========================================
     // START
     // ==========================================
@@ -43,14 +42,7 @@ public class PotionDropSpawner : MonoBehaviour
         spawnTimer = spawnInterval;
 
         currentGroundPotions = 0;
-
-        Debug.Log(
-            "POTION SPAWNER READY | " +
-            "Maximum Ground Potions: " +
-            maxGroundPotions
-        );
     }
-
 
     // ==========================================
     // UPDATE
@@ -77,7 +69,6 @@ public class PotionDropSpawner : MonoBehaviour
         }
     }
 
-
     // ==========================================
     // TIMED POTION
     // ==========================================
@@ -85,36 +76,16 @@ public class PotionDropSpawner : MonoBehaviour
     void SpawnTimedPotion()
     {
         if (currentGroundPotions >= maxGroundPotions)
-        {
-            Debug.Log(
-                "TIMED POTION NOT SPAWNED | " +
-                "Ground Potion Count: " +
-                currentGroundPotions +
-                " / " +
-                maxGroundPotions
-            );
-
             return;
-        }
 
-        GameObject newPotion =
-            Instantiate(
-                potionPrefab,
-                freePotionSpawnPoint.position,
-                freePotionSpawnPoint.rotation
-            );
+        Instantiate(
+            potionPrefab,
+            freePotionSpawnPoint.position,
+            freePotionSpawnPoint.rotation
+        );
 
         currentGroundPotions++;
-
-        Debug.Log(
-            "TIMED POTION SPAWNED | " +
-            "Ground Potions: " +
-            currentGroundPotions +
-            " / " +
-            maxGroundPotions
-        );
     }
-
 
     // ==========================================
     // ENEMY DEFEAT DROP
@@ -127,24 +98,10 @@ public class PotionDropSpawner : MonoBehaviour
             return;
 
         if (potionPrefab == null)
-        {
-            Debug.LogError(
-                "PotionDropSpawner: Potion Prefab is NOT assigned!"
-            );
-
             return;
-        }
 
         if (currentGroundPotions >= maxGroundPotions)
-        {
-            Debug.Log(
-                "ENEMY DROP NOT SPAWNED | " +
-                "Ground Potion Count already MAX: " +
-                currentGroundPotions
-            );
-
             return;
-        }
 
         int dropAmount =
             Random.Range(
@@ -161,7 +118,6 @@ public class PotionDropSpawner : MonoBehaviour
                 dropAmount,
                 availableSpace
             );
-
 
         // ==========================================
         // SPAWN POTIONS
@@ -189,19 +145,7 @@ public class PotionDropSpawner : MonoBehaviour
 
             currentGroundPotions++;
         }
-
-
-        Debug.Log(
-            "ENEMY POTION DROP | " +
-            "Dropped: " +
-            actualDropAmount +
-            " | Ground Potions: " +
-            currentGroundPotions +
-            " / " +
-            maxGroundPotions
-        );
     }
-
 
     // ==========================================
     // POTION PICKED UP
@@ -214,16 +158,7 @@ public class PotionDropSpawner : MonoBehaviour
             return;
 
         currentGroundPotions--;
-
-        Debug.Log(
-            "POTION COLLECTED | " +
-            "Ground Potions: " +
-            currentGroundPotions +
-            " / " +
-            maxGroundPotions
-        );
     }
-
 
     // ==========================================
     // GET CURRENT GROUND POTIONS
