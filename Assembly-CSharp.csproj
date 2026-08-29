@@ -51,7 +51,6 @@
     <Compile Include="Assets\cs files\EnemyShooting.cs" />
     <Compile Include="Assets\cs files\DominoPulse.cs" />
     <Compile Include="Assets\cs files\DropSpawner.cs" />
-    <Compile Include="Assets\cs files\FoxyJumpscare.cs" />
     <Compile Include="Assets\cs files\RedPotion.cs" />
     <Compile Include="Assets\cs files\MusicManager.cs" />
     <Compile Include="Assets\cs files\LurkingNPC.cs" />
@@ -64,6 +63,7 @@
     <Compile Include="Assets\cs files\GreenPotion.cs" />
     <Compile Include="Assets\cs files\PlayerHealth.cs" />
     <Compile Include="Assets\cs files\Bullet.cs" />
+    <Compile Include="Assets\cs files\PlayerMusic.cs" />
     <Compile Include="Assets\cs files\Count.cs" />
     <Compile Include="Assets\cs files\EnemyHealth.cs" />
     <Compile Include="Assets\cs files\AmmoColorUI.cs" />

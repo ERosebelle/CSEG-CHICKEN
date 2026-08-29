@@ -45,11 +45,12 @@ public class Bullet : MonoBehaviour
 
     private bool specialDamageActive;
 
-    // ==========================================
-    // ENABLE
-    // ==========================================
 
-    void OnEnable()
+    // =========================================================
+    // ENABLE
+    // =========================================================
+
+    private void OnEnable()
     {
         timer = 0f;
 
@@ -65,15 +66,16 @@ public class Bullet : MonoBehaviour
         specialDamageActive = false;
     }
 
-    // ==========================================
-    // UPDATE
-    // ==========================================
 
-    void Update()
+    // =========================================================
+    // UPDATE
+    // =========================================================
+
+    private void Update()
     {
-        // ==========================================
+        // =====================================================
         // BULLET LIFETIME
-        // ==========================================
+        // =====================================================
 
         timer += Time.deltaTime;
 
@@ -86,9 +88,10 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        // ==========================================
+
+        // =====================================================
         // SPECIAL DAMAGE
-        // ==========================================
+        // =====================================================
 
         if (specialDamageActive)
         {
@@ -97,9 +100,10 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        // ==========================================
+
+        // =====================================================
         // MOVE BULLET
-        // ==========================================
+        // =====================================================
 
         previousPosition =
             transform.position;
@@ -109,9 +113,10 @@ public class Bullet : MonoBehaviour
             speed *
             Time.deltaTime;
 
-        // ==========================================
+
+        // =====================================================
         // CHECK BULLET MOVEMENT
-        // ==========================================
+        // =====================================================
 
         Vector3 movement =
             transform.position -
@@ -140,20 +145,22 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    // ==========================================
-    // HANDLE HIT
-    // ==========================================
 
-    void HandleHit(
+    // =========================================================
+    // HANDLE HIT
+    // =========================================================
+
+    private void HandleHit(
         Collider hitCollider
     )
     {
         if (hitCollider == null)
             return;
 
-        // ==========================================
+
+        // =====================================================
         // FIND PLAYER HEALTH
-        // ==========================================
+        // =====================================================
 
         PlayerHealth playerHealth =
             hitCollider.GetComponent<PlayerHealth>();
@@ -170,29 +177,49 @@ public class Bullet : MonoBehaviour
                 hitCollider.GetComponentInChildren<PlayerHealth>();
         }
 
-        // ==========================================
+
+        // =====================================================
         // PLAYER FOUND
-        // ==========================================
+        // =====================================================
 
         if (playerHealth != null)
         {
-            // ==========================================
-            // NORMAL DAMAGE
-            // ==========================================
-
-            if (damagePlayer)
-            {
-                playerHealth.TakeDamage(
-                    playerDamage
-                );
-            }
-
-            // ==========================================
-            // SPECIAL DAMAGE
-            // ==========================================
+            // =================================================
+            // SPECIAL BULLET
+            // =================================================
 
             if (specialDamage)
             {
+                Debug.Log(
+                    "================================"
+                );
+
+                Debug.Log(
+                    "SPECIAL BULLET HIT PLAYER"
+                );
+
+                Debug.Log(
+                    "Sending special attack to PlayerHealth."
+                );
+
+                Debug.Log(
+                    "================================"
+                );
+
+
+                // ---------------------------------------------
+                // PLAYER HEALTH HANDLES SPECIAL ATTACK
+                // ---------------------------------------------
+
+                playerHealth.ReceiveSpecialBulletHit(
+                    specialDamageAmount
+                );
+
+
+                // ---------------------------------------------
+                // START CONTINUOUS SPECIAL DAMAGE
+                // ---------------------------------------------
+
                 StartSpecialDamage(
                     playerHealth
                 );
@@ -200,18 +227,53 @@ public class Bullet : MonoBehaviour
                 return;
             }
 
-            // ==========================================
+
+            // =================================================
             // NORMAL BULLET
-            // ==========================================
+            // =================================================
+
+            if (damagePlayer)
+            {
+                Debug.Log(
+                    "================================"
+                );
+
+                Debug.Log(
+                    "NORMAL BULLET HIT PLAYER"
+                );
+
+                Debug.Log(
+                    "Sending normal attack to PlayerHealth."
+                );
+
+                Debug.Log(
+                    "================================"
+                );
+
+
+                // ---------------------------------------------
+                // PLAYER HEALTH HANDLES NORMAL ATTACK
+                // ---------------------------------------------
+
+                playerHealth.ReceiveNormalBulletDamage(
+                    playerDamage
+                );
+            }
+
+
+            // ---------------------------------------------
+            // DISABLE NORMAL BULLET
+            // ---------------------------------------------
 
             gameObject.SetActive(false);
 
             return;
         }
 
-        // ==========================================
+
+        // =====================================================
         // PLAYER TAG
-        // ==========================================
+        // =====================================================
 
         if (hitCollider.CompareTag(playerTag))
         {
@@ -220,55 +282,64 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        // ==========================================
+
+        // =====================================================
         // OTHER OBJECT
-        // ==========================================
+        // =====================================================
 
         gameObject.SetActive(false);
     }
 
-    // ==========================================
-    // START SPECIAL DAMAGE
-    // ==========================================
 
-    void StartSpecialDamage(
+    // =========================================================
+    // START SPECIAL DAMAGE
+    // =========================================================
+
+    private void StartSpecialDamage(
         PlayerHealth playerHealth
     )
     {
         if (playerHealth == null)
             return;
 
+
+        // =====================================================
+        // CONNECT PLAYER
+        // =====================================================
+
         affectedPlayer =
             playerHealth;
+
+
+        // =====================================================
+        // ACTIVATE SPECIAL DAMAGE
+        // =====================================================
 
         specialDamageActive =
             true;
 
+
         specialDamageTimer =
             0f;
 
-        // ==========================================
-        // IMMEDIATE SPECIAL DAMAGE
-        // ==========================================
 
-        ApplySpecialDamage();
-
-        // ==========================================
-        // SPAWN SPECIAL EFFECT
-        // ==========================================
+        // =====================================================
+        // SPAWN SPECIAL DAMAGE EFFECT
+        // =====================================================
 
         SpawnSpecialDamageEffect();
     }
 
-    // ==========================================
-    // UPDATE SPECIAL DAMAGE
-    // ==========================================
 
-    void UpdateSpecialDamage()
+    // =========================================================
+    // UPDATE SPECIAL DAMAGE
+    // =========================================================
+
+    private void UpdateSpecialDamage()
     {
-        // ==========================================
+        // =====================================================
         // PLAYER NO LONGER EXISTS
-        // ==========================================
+        // =====================================================
 
         if (affectedPlayer == null)
         {
@@ -277,9 +348,10 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        // ==========================================
+
+        // =====================================================
         // PLAYER DEAD
-        // ==========================================
+        // =====================================================
 
         if (affectedPlayer.IsDead())
         {
@@ -290,12 +362,14 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        // ==========================================
+
+        // =====================================================
         // CONTINUOUS DAMAGE TIMER
-        // ==========================================
+        // =====================================================
 
         specialDamageTimer -=
             Time.deltaTime;
+
 
         if (specialDamageTimer <= 0f)
         {
@@ -308,9 +382,10 @@ public class Bullet : MonoBehaviour
                 );
         }
 
-        // ==========================================
+
+        // =====================================================
         // FOLLOW PLAYER
-        // ==========================================
+        // =====================================================
 
         if (activeSpecialEffect != null)
         {
@@ -330,11 +405,12 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    // ==========================================
-    // APPLY SPECIAL DAMAGE
-    // ==========================================
 
-    void ApplySpecialDamage()
+    // =========================================================
+    // APPLY SPECIAL DAMAGE
+    // =========================================================
+
+    private void ApplySpecialDamage()
     {
         if (affectedPlayer == null)
             return;
@@ -342,16 +418,22 @@ public class Bullet : MonoBehaviour
         if (specialDamageAmount <= 0f)
             return;
 
+
+        // =====================================================
+        // APPLY CONTINUOUS DAMAGE
+        // =====================================================
+
         affectedPlayer.TakeDamageAmount(
             specialDamageAmount
         );
     }
 
-    // ==========================================
-    // SPAWN SPECIAL DAMAGE EFFECT
-    // ==========================================
 
-    void SpawnSpecialDamageEffect()
+    // =========================================================
+    // SPAWN SPECIAL DAMAGE EFFECT
+    // =========================================================
+
+    private void SpawnSpecialDamageEffect()
     {
         if (specialDamageEffect == null)
             return;
@@ -359,15 +441,21 @@ public class Bullet : MonoBehaviour
         if (affectedPlayer == null)
             return;
 
+
+        // =====================================================
+        // DEFAULT POSITION
+        // =====================================================
+
         Vector3 spawnPosition =
             affectedPlayer.transform.position;
 
         Quaternion spawnRotation =
             Quaternion.identity;
 
-        // ==========================================
+
+        // =====================================================
         // USE MANUAL EFFECT POINT
-        // ==========================================
+        // =====================================================
 
         if (specialDamageEffectPoint != null)
         {
@@ -378,9 +466,10 @@ public class Bullet : MonoBehaviour
                 specialDamageEffectPoint.rotation;
         }
 
-        // ==========================================
+
+        // =====================================================
         // CREATE EFFECT
-        // ==========================================
+        // =====================================================
 
         activeSpecialEffect =
             Instantiate(
@@ -390,11 +479,12 @@ public class Bullet : MonoBehaviour
             );
     }
 
-    // ==========================================
-    // STOP SPECIAL DAMAGE
-    // ==========================================
 
-    void StopSpecialDamage()
+    // =========================================================
+    // STOP SPECIAL DAMAGE
+    // =========================================================
+
+    private void StopSpecialDamage()
     {
         specialDamageActive =
             false;
@@ -402,9 +492,10 @@ public class Bullet : MonoBehaviour
         affectedPlayer =
             null;
 
-        // ==========================================
-        // REMOVE EFFECT
-        // ==========================================
+
+        // =====================================================
+        // REMOVE SPECIAL EFFECT
+        // =====================================================
 
         if (activeSpecialEffect != null)
         {

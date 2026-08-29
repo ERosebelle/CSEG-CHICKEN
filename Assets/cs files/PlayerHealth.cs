@@ -8,6 +8,7 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField]
     private float currentHealth = 100f;
 
+
     [Header("Hearts")]
     public GameObject heart1;
     public GameObject heart2;
@@ -17,11 +18,22 @@ public class PlayerHealth : MonoBehaviour
     public GameObject heart6;
     public GameObject heart7;
 
-    [Header("Death Jumpscare")]
-    [Tooltip("Drag the GameObject containing FoxyJumpscare here.")]
-    public FoxyJumpscare foxyJumpscare;
+
+    [Header("Player Music")]
+    public PlayerMusic playerMusic;
+
 
     private bool isDead = false;
+
+
+    // =========================================================
+    // AWAKE
+    // =========================================================
+
+    private void Awake()
+    {
+        FindPlayerMusic();
+    }
 
 
     // =========================================================
@@ -33,34 +45,83 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
         isDead = false;
 
-        // -----------------------------------------------------
-        // AUTOMATICALLY FIND FOXY JUMPSCARE
-        // -----------------------------------------------------
+        FindPlayerMusic();
 
-        if (foxyJumpscare == null)
-        {
-            foxyJumpscare =
-                FindFirstObjectByType<FoxyJumpscare>(
-                    FindObjectsInactive.Include
-                );
-        }
+        UpdateHealthUI();
+        LogHealthPercentage();
+    }
 
-        if (foxyJumpscare != null)
+
+    // =========================================================
+    // FIND PLAYER MUSIC
+    // =========================================================
+
+    private void FindPlayerMusic()
+    {
+        if (playerMusic != null)
+            return;
+
+
+        // Same GameObject
+        playerMusic =
+            GetComponent<PlayerMusic>();
+
+        if (playerMusic != null)
         {
             Debug.Log(
-                "PlayerHealth: FoxyJumpscare connected automatically: " +
-                foxyJumpscare.name
+                "PlayerHealth: PlayerMusic found on same GameObject."
+            );
+
+            return;
+        }
+
+
+        // Parent
+        playerMusic =
+            GetComponentInParent<PlayerMusic>();
+
+        if (playerMusic != null)
+        {
+            Debug.Log(
+                "PlayerHealth: PlayerMusic found on parent."
+            );
+
+            return;
+        }
+
+
+        // Children
+        playerMusic =
+            GetComponentInChildren<PlayerMusic>();
+
+        if (playerMusic != null)
+        {
+            Debug.Log(
+                "PlayerHealth: PlayerMusic found in child."
+            );
+
+            return;
+        }
+
+
+        // Anywhere in the scene
+        playerMusic =
+            FindFirstObjectByType<PlayerMusic>();
+
+
+        if (playerMusic != null)
+        {
+            Debug.Log(
+                "PlayerHealth: PlayerMusic found in scene: " +
+                playerMusic.name
             );
         }
         else
         {
             Debug.LogError(
-                "PlayerHealth: Could NOT find FoxyJumpscare!"
+                "PlayerHealth: NO PlayerMusic FOUND!"
             );
         }
-
-        UpdateHealthUI();
-        LogHealthPercentage();
     }
 
 
@@ -72,6 +133,7 @@ public class PlayerHealth : MonoBehaviour
     {
         DetectBullet(other);
     }
+
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -91,8 +153,10 @@ public class PlayerHealth : MonoBehaviour
         if (hitCollider == null)
             return;
 
+
         Bullet enemyBullet =
             hitCollider.GetComponent<Bullet>();
+
 
         if (enemyBullet == null)
         {
@@ -100,27 +164,118 @@ public class PlayerHealth : MonoBehaviour
                 hitCollider.GetComponentInParent<Bullet>();
         }
 
+
         if (enemyBullet == null)
         {
             enemyBullet =
                 hitCollider.GetComponentInChildren<Bullet>();
         }
 
+
         if (enemyBullet == null)
             return;
 
-        // -----------------------------------------------------
-        // SPECIAL DAMAGE
-        // -----------------------------------------------------
+
+        // =====================================================
+        // SPECIAL ATTACK
+        // =====================================================
 
         if (enemyBullet.specialDamage)
+        {
+            ReceiveSpecialBulletHit(
+                enemyBullet.specialDamageAmount
+            );
+
+            return;
+        }
+
+
+        // =====================================================
+        // NORMAL ATTACK
+        // =====================================================
+
+        if (enemyBullet.damagePlayer)
+        {
+            ReceiveNormalBulletDamage(
+                enemyBullet.playerDamage
+            );
+        }
+    }
+
+
+    // =========================================================
+    // NORMAL BULLET DAMAGE
+    // =========================================================
+
+    public void ReceiveNormalBulletDamage(float damage)
+    {
+        if (isDead)
             return;
 
-        // -----------------------------------------------------
-        // NORMAL DAMAGE
-        // -----------------------------------------------------
+        Debug.Log(
+            "PLAYER HIT BY NORMAL ATTACK"
+        );
 
-        TakeDamageFromBullet(enemyBullet);
+
+        // Make absolutely sure PlayerMusic is connected.
+        if (playerMusic == null)
+        {
+            FindPlayerMusic();
+        }
+
+
+        // Play normal hit sound.
+        if (playerMusic != null)
+        {
+            playerMusic.PlayNormalHitSound();
+        }
+        else
+        {
+            Debug.LogError(
+                "PlayerHealth: Cannot play normal hit sound because PlayerMusic is missing."
+            );
+        }
+
+
+        TakeDamage(damage);
+    }
+
+
+    // =========================================================
+    // SPECIAL BULLET DAMAGE
+    // =========================================================
+
+    public void ReceiveSpecialBulletHit(float damage)
+    {
+        if (isDead)
+            return;
+
+        Debug.Log(
+            "PLAYER HIT BY SPECIAL ATTACK"
+        );
+
+
+        // Make absolutely sure PlayerMusic is connected.
+        if (playerMusic == null)
+        {
+            FindPlayerMusic();
+        }
+
+
+        // Play special hit sound.
+        if (playerMusic != null)
+        {
+            playerMusic.PlaySpecialHitSound();
+        }
+        else
+        {
+            Debug.LogError(
+                "PlayerHealth: Cannot play special hit sound because PlayerMusic is missing."
+            );
+        }
+
+
+        TakeDamage(damage);
     }
 
 
@@ -139,7 +294,10 @@ public class PlayerHealth : MonoBehaviour
         if (!enemyBullet.damagePlayer)
             return;
 
-        TakeDamage(enemyBullet.playerDamage);
+
+        ReceiveNormalBulletDamage(
+            enemyBullet.playerDamage
+        );
     }
 
 
@@ -155,7 +313,9 @@ public class PlayerHealth : MonoBehaviour
         if (damage <= 0f)
             return;
 
+
         currentHealth -= damage;
+
 
         currentHealth =
             Mathf.Clamp(
@@ -164,12 +324,10 @@ public class PlayerHealth : MonoBehaviour
                 maxHealth
             );
 
+
         UpdateHealthUI();
         LogHealthPercentage();
 
-        // -----------------------------------------------------
-        // PLAYER DEFEATED
-        // -----------------------------------------------------
 
         if (currentHealth <= 0f)
         {
@@ -184,6 +342,13 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamageAmount(float damage)
     {
+        if (isDead)
+            return;
+
+        if (damage <= 0f)
+            return;
+
+
         TakeDamage(damage);
     }
 
@@ -197,7 +362,10 @@ public class PlayerHealth : MonoBehaviour
         if (isDead)
             return;
 
-        currentHealth = maxHealth;
+
+        currentHealth =
+            maxHealth;
+
 
         UpdateHealthUI();
         LogHealthPercentage();
@@ -213,13 +381,17 @@ public class PlayerHealth : MonoBehaviour
         if (maxHealth <= 0f)
             return;
 
+
         float healthPerHeart =
             maxHealth / 7f;
 
+
         int activeHearts =
             Mathf.CeilToInt(
-                currentHealth / healthPerHeart
+                currentHealth /
+                healthPerHeart
             );
+
 
         activeHearts =
             Mathf.Clamp(
@@ -227,6 +399,7 @@ public class PlayerHealth : MonoBehaviour
                 0,
                 7
             );
+
 
         if (heart1 != null)
             heart1.SetActive(activeHearts >= 1);
@@ -260,8 +433,10 @@ public class PlayerHealth : MonoBehaviour
         if (maxHealth <= 0f)
             return;
 
+
         float healthPercentage =
             (currentHealth / maxHealth) * 100f;
+
 
         Debug.Log(
             "PLAYER HEALTH: " +
@@ -280,35 +455,27 @@ public class PlayerHealth : MonoBehaviour
         if (isDead)
             return;
 
+
         isDead = true;
 
         currentHealth = 0f;
 
+
         UpdateHealthUI();
         LogHealthPercentage();
 
-        Debug.Log("================================");
-        Debug.Log("PLAYER DEFEATED");
-        Debug.Log("================================");
 
-        // -----------------------------------------------------
-        // ACTIVATE FOXY
-        // -----------------------------------------------------
+        Debug.Log(
+            "================================"
+        );
 
-        if (foxyJumpscare != null)
-        {
-            Debug.Log(
-                "PlayerHealth: Calling FoxyJumpscare.ShowFoxy()"
-            );
+        Debug.Log(
+            "PLAYER DEFEATED"
+        );
 
-            foxyJumpscare.ShowFoxy();
-        }
-        else
-        {
-            Debug.LogError(
-                "PlayerHealth: FoxyJumpscare reference is NULL!"
-            );
-        }
+        Debug.Log(
+            "================================"
+        );
     }
 
 
@@ -331,7 +498,9 @@ public class PlayerHealth : MonoBehaviour
         if (maxHealth <= 0f)
             return 0f;
 
-        return currentHealth / maxHealth;
+
+        return currentHealth /
+               maxHealth;
     }
 
 

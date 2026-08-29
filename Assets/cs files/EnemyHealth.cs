@@ -17,13 +17,43 @@ public class EnemyHealth : MonoBehaviour
     public float regenerationPerSecond = 5f;
     public float regenerationRadius = 10f;
 
+    // =========================================================
+    // DROPS
+    // =========================================================
+
     [Header("Drops")]
+
+    [Tooltip("Mystery Potion prefab.")]
     public GameObject mysteryPotion;
+
+    [Min(0)]
+    [Tooltip("Number of Mystery Potions dropped.")]
+    public int mysteryPotionAmount = 1;
+
+    [Tooltip("Health Potion prefab.")]
     public GameObject healthPotion;
+
+    [Min(0)]
+    [Tooltip("Number of Health Potions dropped.")]
+    public int healthPotionAmount = 1;
+
+    [Tooltip("Ammo Potion prefab.")]
     public GameObject ammoPotion;
+
+    [Min(0)]
+    [Tooltip("Number of Ammo Potions dropped.")]
+    public int ammoPotionAmount = 1;
+
+    // =========================================================
+    // DROP SPAWN SITE
+    // =========================================================
 
     [Header("Drop Spawn Site")]
     public Transform spawnPotion;
+
+    // =========================================================
+    // ENEMY COUNTER
+    // =========================================================
 
     [Header("Enemy Counter")]
     public EnemyCounter enemyCounter;
@@ -33,6 +63,10 @@ public class EnemyHealth : MonoBehaviour
 
     private bool wasRegenerating;
     private bool wasRegenerationBlocked;
+
+    // =========================================================
+    // START
+    // =========================================================
 
     void Start()
     {
@@ -55,6 +89,10 @@ public class EnemyHealth : MonoBehaviour
         UpdateHeartModels();
     }
 
+    // =========================================================
+    // UPDATE
+    // =========================================================
+
     void Update()
     {
         if (isDefeated)
@@ -63,9 +101,9 @@ public class EnemyHealth : MonoBehaviour
         CheckRegeneration();
     }
 
-    // ==========================================
+    // =========================================================
     // TAKE DAMAGE
-    // ==========================================
+    // =========================================================
 
     public void TakeDamage()
     {
@@ -74,11 +112,12 @@ public class EnemyHealth : MonoBehaviour
 
         currentHealth -= damagePerHit;
 
-        currentHealth = Mathf.Clamp(
-            currentHealth,
-            0f,
-            maxHealth
-        );
+        currentHealth =
+            Mathf.Clamp(
+                currentHealth,
+                0f,
+                maxHealth
+            );
 
         UpdateHeartModels();
 
@@ -88,9 +127,9 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    // ==========================================
+    // =========================================================
     // REGENERATION
-    // ==========================================
+    // =========================================================
 
     void CheckRegeneration()
     {
@@ -173,18 +212,19 @@ public class EnemyHealth : MonoBehaviour
             regenerationPerSecond *
             Time.deltaTime;
 
-        currentHealth = Mathf.Clamp(
-            currentHealth,
-            0f,
-            maxHealth
-        );
+        currentHealth =
+            Mathf.Clamp(
+                currentHealth,
+                0f,
+                maxHealth
+            );
 
         UpdateHeartModels();
     }
 
-    // ==========================================
+    // =========================================================
     // UPDATE HEART MODELS
-    // ==========================================
+    // =========================================================
 
     void UpdateHeartModels()
     {
@@ -216,9 +256,9 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    // ==========================================
+    // =========================================================
     // DEFEAT
-    // ==========================================
+    // =========================================================
 
     void Defeat()
     {
@@ -245,52 +285,93 @@ public class EnemyHealth : MonoBehaviour
             enemyCounter.EnemyDefeated();
         }
 
+        // ==========================================
+        // SPAWN DROPS
+        // ==========================================
+
         SpawnDrops();
+
+        // ==========================================
+        // DESTROY ENEMY
+        // ==========================================
 
         Destroy(gameObject);
     }
 
-    // ==========================================
+    // =========================================================
     // SPAWN DROPS
-    // ==========================================
+    // =========================================================
 
     void SpawnDrops()
     {
         if (spawnPotion == null)
-            return;
+        {
+            Debug.LogWarning(
+                "EnemyHealth: Drop Spawn Site is not assigned."
+            );
 
-        SpawnDrop(mysteryPotion);
-        SpawnDrop(healthPotion);
-        SpawnDrop(ammoPotion);
+            return;
+        }
+
+        // Mystery Potion
+        SpawnDropsAmount(
+            mysteryPotion,
+            mysteryPotionAmount
+        );
+
+        // Health Potion
+        SpawnDropsAmount(
+            healthPotion,
+            healthPotionAmount
+        );
+
+        // Ammo Potion
+        SpawnDropsAmount(
+            ammoPotion,
+            ammoPotionAmount
+        );
     }
 
-    void SpawnDrop(GameObject dropPrefab)
+    // =========================================================
+    // SPAWN MULTIPLE DROPS
+    // =========================================================
+
+    void SpawnDropsAmount(
+        GameObject dropPrefab,
+        int amount
+    )
     {
         if (dropPrefab == null)
             return;
 
-        GameObject spawnedDrop =
-            Instantiate(
-                dropPrefab,
-                spawnPotion.position,
-                spawnPotion.rotation
-            );
+        if (amount <= 0)
+            return;
 
-        spawnedDrop.SetActive(true);
+        for (int i = 0; i < amount; i++)
+        {
+            GameObject spawnedDrop =
+                Instantiate(
+                    dropPrefab,
+                    spawnPotion.position,
+                    spawnPotion.rotation
+                );
+
+            spawnedDrop.SetActive(true);
+        }
     }
 
-    // ==========================================
+    // =========================================================
     // GET CURRENT HEALTH
-    // ==========================================
+    // =========================================================
 
     public float GetCurrentHealth()
     {
         return currentHealth;
     }
 
-    // ==========================================
+    // =========================================================
     // GET HEALTH PERCENT
-    // ==========================================
+    // =========================================================
 
     public float GetHealthPercent()
     {
@@ -300,18 +381,18 @@ public class EnemyHealth : MonoBehaviour
         return currentHealth / maxHealth;
     }
 
-    // ==========================================
+    // =========================================================
     // CHECK DEFEATED
-    // ==========================================
+    // =========================================================
 
     public bool IsDefeated()
     {
         return isDefeated;
     }
 
-    // ==========================================
+    // =========================================================
     // REGENERATION GIZMO
-    // ==========================================
+    // =========================================================
 
     void OnDrawGizmosSelected()
     {
