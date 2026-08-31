@@ -7006,7 +7006,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7073b568ff840a429d684f6314bbaeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  timeRemaining: 300
+  timeRemaining: 30
   timerIsRunning: 1
   timerText: {fileID: 2063503348}
   defeatedBackground: {fileID: 555824859}

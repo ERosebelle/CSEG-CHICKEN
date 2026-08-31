@@ -29,6 +29,6 @@ public class GameOverManager : MonoBehaviour
         
         // Temporary: reload current game
         Scene currentScene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(currentScene.name);
+        SceneManager.LoadScene("MainMenu");
     }
 }
