@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EnemyHealth : MonoBehaviour
 {
@@ -56,13 +57,26 @@ public class EnemyHealth : MonoBehaviour
     // =========================================================
 
     [Header("Enemy Counter")]
+
+    public bool isRound2Enemy = false;
+
     public EnemyCounter enemyCounter;
+    public EnemyCounter2 enemyCounter2;
 
     private float currentHealth;
     private bool isDefeated;
 
     private bool wasRegenerating;
     private bool wasRegenerationBlocked;
+
+    // =========================================================
+    // TUTORIAL CHECK
+    // =========================================================
+
+    private bool IsTutorialScene()
+    {
+        return SceneManager.GetActiveScene().name == "Tutorial Scene";
+    }
 
     // =========================================================
     // START
@@ -77,13 +91,36 @@ public class EnemyHealth : MonoBehaviour
         wasRegenerationBlocked = false;
 
         // ==========================================
-        // FIND ENEMY COUNTER AUTOMATICALLY
+        // DO NOT LOOK FOR ENEMY COUNTER IN TUTORIAL
         // ==========================================
 
-        if (enemyCounter == null)
+        if (!IsTutorialScene())
         {
-            enemyCounter =
-                FindFirstObjectByType<EnemyCounter>();
+            // ==========================================
+            // FIND CORRECT ENEMY COUNTER AUTOMATICALLY
+            // INCLUDING INACTIVE OBJECTS
+            // ==========================================
+
+            if (isRound2Enemy)
+            {
+                if (enemyCounter2 == null)
+                {
+                    enemyCounter2 =
+                        FindFirstObjectByType<EnemyCounter2>(
+                            FindObjectsInactive.Include
+                        );
+                }
+            }
+            else
+            {
+                if (enemyCounter == null)
+                {
+                    enemyCounter =
+                        FindFirstObjectByType<EnemyCounter>(
+                            FindObjectsInactive.Include
+                        );
+                }
+            }
         }
 
         UpdateHeartModels();
@@ -257,6 +294,27 @@ public class EnemyHealth : MonoBehaviour
     }
 
     // =========================================================
+    // TUTORIAL TASK 8
+    // FORCE DEFEAT
+    // =========================================================
+
+    public void DefeatFromTutorial()
+    {
+        // Only works inside Tutorial Scene
+        if (!IsTutorialScene())
+            return;
+
+        if (isDefeated)
+            return;
+
+        Debug.Log(
+            "TUTORIAL TASK 8: ENEMY FORCED TO DEFEAT AT PLAYER 50% HEALTH."
+        );
+
+        Defeat();
+    }
+
+    // =========================================================
     // DEFEAT
     // =========================================================
 
@@ -271,18 +329,64 @@ public class EnemyHealth : MonoBehaviour
         UpdateHeartModels();
 
         // ==========================================
-        // SEND DEFEAT TO ENEMY COUNTER
+        // TUTORIAL SCENE
         // ==========================================
 
-        if (enemyCounter == null)
+        // Tutorial enemies do not use EnemyCounter.
+        if (IsTutorialScene())
         {
-            enemyCounter =
-                FindFirstObjectByType<EnemyCounter>();
+            SpawnDrops();
+
+            Destroy(gameObject);
+
+            return;
         }
 
-        if (enemyCounter != null)
+        // ==========================================
+        // NORMAL GAMEPLAY
+        // ==========================================
+
+        if (isRound2Enemy)
         {
-            enemyCounter.EnemyDefeated();
+            if (enemyCounter2 == null)
+            {
+                enemyCounter2 =
+                    FindFirstObjectByType<EnemyCounter2>(
+                        FindObjectsInactive.Include
+                    );
+            }
+
+            if (enemyCounter2 != null)
+            {
+                enemyCounter2.EnemyDefeated();
+            }
+            else
+            {
+                Debug.LogError(
+                    "EnemyHealth: EnemyCounter2 NOT FOUND!"
+                );
+            }
+        }
+        else
+        {
+            if (enemyCounter == null)
+            {
+                enemyCounter =
+                    FindFirstObjectByType<EnemyCounter>(
+                        FindObjectsInactive.Include
+                    );
+            }
+
+            if (enemyCounter != null)
+            {
+                enemyCounter.EnemyDefeated();
+            }
+            else
+            {
+                Debug.LogError(
+                    "EnemyHealth: EnemyCounter NOT FOUND!"
+                );
+            }
         }
 
         // ==========================================

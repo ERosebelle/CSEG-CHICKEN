@@ -51,20 +51,70 @@ public class PlayerBullet : MonoBehaviour
             GameObject hitObject =
                 hit.collider.gameObject;
 
-            GameObject enemyObject = null;
+            // ==========================================
+            // CUBE DETECTION
+            // ==========================================
+
+            CubeHealth cubeHealth =
+                hitObject.GetComponent<CubeHealth>();
+
+            if (cubeHealth == null)
+            {
+                cubeHealth =
+                    hitObject.GetComponentInParent<CubeHealth>();
+            }
+
+            if (cubeHealth != null)
+            {
+                CubeColorWeakness cubeWeakness =
+                    cubeHealth.GetComponent<CubeColorWeakness>();
+
+                if (cubeWeakness == null)
+                {
+                    cubeWeakness =
+                        cubeHealth.GetComponentInParent<CubeColorWeakness>();
+                }
+
+                if (cubeWeakness != null)
+                {
+                    bool correctColor =
+                        cubeWeakness.IsWeaknessColor(
+                            bulletColor
+                        );
+
+                    if (correctColor)
+                    {
+                        cubeHealth.TakeDamage();
+
+                        cubeWeakness.RegisterHit();
+                    }
+                    else
+                    {
+                        CubeSpawner spawner =
+                            FindFirstObjectByType<CubeSpawner>();
+
+                        if (spawner != null)
+                        {
+                            spawner.SpawnExtraCube();
+                        }
+                    }
+                }
+
+                gameObject.SetActive(false);
+
+                return;
+            }
 
             // ==========================================
-            // CHECK HIT OBJECT
+            // ORIGINAL ENEMY SYSTEM
             // ==========================================
+
+            GameObject enemyObject = null;
 
             if (hitObject.CompareTag(enemyTag))
             {
                 enemyObject = hitObject;
             }
-
-            // ==========================================
-            // CHECK PARENTS
-            // ==========================================
 
             if (enemyObject == null)
             {
@@ -86,10 +136,6 @@ public class PlayerBullet : MonoBehaviour
                 }
             }
 
-            // ==========================================
-            // ENEMY FOUND
-            // ==========================================
-
             if (enemyObject != null)
             {
                 EnemyHealth enemyHealth =
@@ -103,10 +149,6 @@ public class PlayerBullet : MonoBehaviour
 
                 if (enemyHealth != null)
                 {
-                    // ==========================================
-                    // FIND ENEMY COLOR WEAKNESS
-                    // ==========================================
-
                     EnemyColorWeakness enemyWeakness =
                         enemyHealth.GetComponent<EnemyColorWeakness>();
 
@@ -116,10 +158,6 @@ public class PlayerBullet : MonoBehaviour
                             enemyHealth.GetComponentInParent<EnemyColorWeakness>();
                     }
 
-                    // ==========================================
-                    // CHECK BULLET COLOR
-                    // ==========================================
-
                     if (enemyWeakness != null)
                     {
                         bool correctColor =
@@ -127,19 +165,10 @@ public class PlayerBullet : MonoBehaviour
                                 bulletColor
                             );
 
-                        // ==========================================
-                        // CORRECT COLOR
-                        // ==========================================
-
                         if (correctColor)
                         {
                             enemyHealth.TakeDamage();
                         }
-
-                        // ==========================================
-                        // WRONG COLOR
-                        // ==========================================
-
                         else
                         {
                             EnemyShooting enemyShooting =
@@ -158,10 +187,6 @@ public class PlayerBullet : MonoBehaviour
                         }
                     }
 
-                    // ==========================================
-                    // ACTIVATE ENEMY AI HIT DETECTION
-                    // ==========================================
-
                     EnemyAI enemyAI =
                         enemyHealth.GetComponent<EnemyAI>();
 
@@ -177,10 +202,6 @@ public class PlayerBullet : MonoBehaviour
                     }
                 }
 
-                // ==========================================
-                // REMOVE BULLET
-                // ==========================================
-
                 gameObject.SetActive(false);
 
                 return;
@@ -190,170 +211,8 @@ public class PlayerBullet : MonoBehaviour
             // NON-ENEMY OBJECT
             // ==========================================
 
-            ChangeHitObjectColor(hitObject);
-
             gameObject.SetActive(false);
         }
-    }
-
-    // ==========================================
-    // GET BULLET COLOR NAME
-    // ==========================================
-
-    string GetBulletColorName()
-    {
-        if (ApproximatelyColor(
-            bulletColor,
-            Color.red))
-        {
-            return "RED";
-        }
-
-        if (ApproximatelyColor(
-            bulletColor,
-            Color.blue))
-        {
-            return "BLUE";
-        }
-
-        if (ApproximatelyColor(
-            bulletColor,
-            Color.green))
-        {
-            return "GREEN";
-        }
-
-        if (ApproximatelyColor(
-            bulletColor,
-            Color.yellow))
-        {
-            return "YELLOW";
-        }
-
-        return "OTHER";
-    }
-
-    // ==========================================
-    // COLOR COMPARISON
-    // ==========================================
-
-    bool ApproximatelyColor(
-        Color a,
-        Color b
-    )
-    {
-        return Mathf.Abs(a.r - b.r) < 0.05f &&
-               Mathf.Abs(a.g - b.g) < 0.05f &&
-               Mathf.Abs(a.b - b.b) < 0.05f;
-    }
-
-    // ==========================================
-    // CHANGE OBJECT COLOR
-    // ==========================================
-
-    void ChangeHitObjectColor(
-        GameObject hitObject
-    )
-    {
-        // ==========================================
-        // FIND EXISTING MAP COLOR OBJECT
-        // ==========================================
-
-        MapColorObject mapColorObject =
-            hitObject.GetComponent<MapColorObject>();
-
-        if (mapColorObject == null)
-        {
-            mapColorObject =
-                hitObject.GetComponentInParent<MapColorObject>();
-        }
-
-        // ==========================================
-        // EXISTING MAP COLOR OBJECT FOUND
-        // ==========================================
-
-        if (mapColorObject != null)
-        {
-            mapColorObject.ApplyColor(
-                bulletColor
-            );
-
-            return;
-        }
-
-        // ==========================================
-        // FIND OBJECT THAT OWNS RENDERER
-        // ==========================================
-
-        GameObject colorObject =
-            hitObject;
-
-        Renderer renderer =
-            colorObject.GetComponent<Renderer>();
-
-        // ==========================================
-        // CHECK PARENTS
-        // ==========================================
-
-        if (renderer == null)
-        {
-            Transform parent =
-                hitObject.transform.parent;
-
-            while (parent != null)
-            {
-                renderer =
-                    parent.GetComponent<Renderer>();
-
-                if (renderer != null)
-                {
-                    colorObject =
-                        parent.gameObject;
-
-                    break;
-                }
-
-                parent =
-                    parent.parent;
-            }
-        }
-
-        // ==========================================
-        // CHECK CHILDREN
-        // ==========================================
-
-        if (renderer == null)
-        {
-            Renderer[] childRenderers =
-                hitObject.GetComponentsInChildren<Renderer>();
-
-            if (childRenderers.Length > 0)
-            {
-                colorObject =
-                    hitObject;
-            }
-        }
-
-        // ==========================================
-        // ADD MAP COLOR OBJECT
-        // ==========================================
-
-        mapColorObject =
-            colorObject.GetComponent<MapColorObject>();
-
-        if (mapColorObject == null)
-        {
-            mapColorObject =
-                colorObject.AddComponent<MapColorObject>();
-        }
-
-        // ==========================================
-        // APPLY COLOR
-        // ==========================================
-
-        mapColorObject.ApplyColor(
-            bulletColor
-        );
     }
 
     // ==========================================

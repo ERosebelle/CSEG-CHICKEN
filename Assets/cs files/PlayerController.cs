@@ -21,6 +21,9 @@ public class PlayerController : MonoBehaviour
     public float stepCheckDistance = 0.5f;
     public float stepSmooth = 5f;
 
+    [Header("Double Jump")]
+    public float doubleJumpForce = 40f;
+
     private Rigidbody rb;
     private Vector2 moveInput;
 
@@ -28,11 +31,17 @@ public class PlayerController : MonoBehaviour
     private bool isHoldingJump;
     private float jumpHoldTime;
 
+    private bool hasUsedDoubleJump = false;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
 
         rb.freezeRotation = true;
+
+        // Force the double jump value to 40
+        // even if Unity's Inspector has an old saved value.
+        doubleJumpForce = 40f;
     }
 
     void Start()
@@ -80,6 +89,9 @@ public class PlayerController : MonoBehaviour
 
     void HandleRunToggle()
     {
+        if (Keyboard.current == null)
+            return;
+
         if (Keyboard.current.leftShiftKey.wasPressedThisFrame ||
             Keyboard.current.rightShiftKey.wasPressedThisFrame)
         {
@@ -102,6 +114,9 @@ public class PlayerController : MonoBehaviour
 
     void HandleJump()
     {
+        if (Keyboard.current == null)
+            return;
+
         if (Keyboard.current.spaceKey.wasPressedThisFrame &&
             isGrounded)
         {
@@ -223,6 +238,41 @@ public class PlayerController : MonoBehaviour
     }
 
     // ==========================================
+    // DOUBLE JUMP
+    // ==========================================
+
+    public bool CanDoubleJump()
+    {
+        return !isGrounded && !hasUsedDoubleJump;
+    }
+
+    public void PerformDoubleJump()
+    {
+        if (isGrounded)
+            return;
+
+        if (hasUsedDoubleJump)
+            return;
+
+        // Use PlayerController's own double jump force
+        rb.linearVelocity = new Vector3(
+            rb.linearVelocity.x,
+            doubleJumpForce,
+            rb.linearVelocity.z
+        );
+
+        // Mark double jump as used
+        hasUsedDoubleJump = true;
+
+        // Stop normal jump-hold system
+        isHoldingJump = false;
+
+        Debug.Log(
+            "DOUBLE JUMP! Force: " + doubleJumpForce
+        );
+    }
+
+    // ==========================================
     // GROUND DETECTION
     // ==========================================
 
@@ -233,6 +283,10 @@ public class PlayerController : MonoBehaviour
             if (contact.normal.y > 0.5f)
             {
                 isGrounded = true;
+
+                // Reset double jump when landing
+                hasUsedDoubleJump = false;
+
                 return;
             }
         }

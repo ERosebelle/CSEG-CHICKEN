@@ -25,6 +25,9 @@ public class PlayerShoot : MonoBehaviour
     [Header("Ammo")]
     public AmmoCount ammoCount;
 
+    [Header("Ammo Fired")]
+    public AmmoFiredCount ammoFiredCount;
+
     [Header("Potion Counts")]
     public RedCount redCount;
     public BlueCount blueCount;
@@ -242,7 +245,14 @@ public class PlayerShoot : MonoBehaviour
                 GetCurrentBulletColor();
         }
 
+        // Remove one available ammo
         ammoCount.RemoveAmmo();
+
+        // Count one successful shot
+        if (ammoFiredCount != null)
+        {
+            ammoFiredCount.AddShot();
+        }
     }
 
     bool HasPotion(int color)

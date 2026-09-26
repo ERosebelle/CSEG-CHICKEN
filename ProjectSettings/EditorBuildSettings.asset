@@ -5,9 +5,24 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scene/MainMenu.unity
+    guid: b9b6339e7ddbde649843b68adca4346f
+  - enabled: 1
+    path: Assets/Scene/tutorialRoom.unity
+    guid: 5dba5b45c330c434c8063d3d8677e6f9
+  - enabled: 1
+    path: Assets/Scene/farmRoom.unity
+    guid: 40efe49b0208b9344bb7a5f75021f88d
+  - enabled: 1
+    path: Assets/Scene/gameplay.unity
+    guid: 61458498914495c4093d7bb279f8e043
+  - enabled: 1
+    path: Assets/Scene/Credits.unity
+    guid: de70a8bb231bb404fb8791bd22d409b6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EnemyAI : MonoBehaviour
 {
@@ -31,6 +32,20 @@ public class EnemyAI : MonoBehaviour
     public float returnSpeed = 3f;
     public float returnDistance = 0.1f;
 
+    // =========================================================
+    // TUTORIAL ONLY
+    // =========================================================
+
+    [Header("Tutorial Scene Attack")]
+    public float tutorialDamage = 10f;
+    public float tutorialAttackInterval = 1f;
+
+    private float tutorialAttackTimer = 0f;
+
+    // =========================================================
+    // EXISTING LOGIC
+    // =========================================================
+
     private Vector3 originalPosition;
 
     private float hitDetectionTimer;
@@ -44,12 +59,30 @@ public class EnemyAI : MonoBehaviour
         hitDetectionActive = false;
 
         enemyBulletCount = startingBulletCount;
+
+        // =====================================================
+        // TUTORIAL SCENE ONLY
+        // =====================================================
+
+        if (SceneManager.GetActiveScene().name == "Tutorial Scene")
+        {
+            tutorialAttackTimer = 0f;
+        }
     }
 
     void Update()
     {
         if (player == null)
             return;
+
+        // =====================================================
+        // TUTORIAL SCENE ONLY
+        // =====================================================
+
+        if (SceneManager.GetActiveScene().name == "Tutorial Scene")
+        {
+            HandleTutorialAttack();
+        }
 
         // ==========================================
         // HIT DETECTION TIMER
@@ -110,6 +143,59 @@ public class EnemyAI : MonoBehaviour
         {
             ChasePlayer();
         }
+    }
+
+    // =========================================================
+    // TUTORIAL SCENE ATTACK
+    // =========================================================
+
+    private void HandleTutorialAttack()
+    {
+        if (player == null)
+            return;
+
+        float distance =
+            Vector3.Distance(
+                transform.position,
+                player.position
+            );
+
+        if (distance > detectionRange)
+            return;
+
+        tutorialAttackTimer -= Time.deltaTime;
+
+        if (tutorialAttackTimer > 0f)
+            return;
+
+        tutorialAttackTimer =
+            tutorialAttackInterval;
+
+        PlayerHealth playerHealth =
+            player.GetComponent<PlayerHealth>();
+
+        if (playerHealth == null)
+        {
+            playerHealth =
+                player.GetComponentInParent<PlayerHealth>();
+        }
+
+        if (playerHealth == null)
+        {
+            playerHealth =
+                player.GetComponentInChildren<PlayerHealth>();
+        }
+
+        if (playerHealth == null)
+            return;
+
+        playerHealth.TakeDamage(tutorialDamage);
+
+        Debug.Log(
+            "TUTORIAL CORRUPTED PLANT ATTACKED PLAYER: -"
+            + tutorialDamage
+            + " HEALTH"
+        );
     }
 
     // ==========================================

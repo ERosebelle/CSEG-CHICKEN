@@ -3,7 +3,17 @@ guid: 54d451609b33d3f4c8a9f9c12f816c48
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_wil_chicken_01
+    second: {fileID: 2100000, guid: 928182157413b32408ab1b77b11c93b1, type: 2}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: wil_chicken_01_di
+    second: {fileID: 2800000, guid: 9ff5be2dc41713e419ee719a48fa8c7e, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0

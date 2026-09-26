@@ -15,6 +15,9 @@ public class AmmoPotion : MonoBehaviour
     [Header("Maximum Ammo")]
     public int maxAmmo = 99;
 
+    [Header("Ammo Spawner")]
+    public AmmoSpawner ammoSpawner;
+
     private bool playerNearby = false;
 
     // ==========================================
@@ -127,6 +130,13 @@ public class AmmoPotion : MonoBehaviour
 
         playerNearby = false;
 
+        // Tell the spawner that the ammo was picked up
+        if (ammoSpawner != null)
+        {
+            ammoSpawner.AmmoPickedUp();
+        }
+
+        // Disable this potion
         gameObject.SetActive(false);
     }
 }
